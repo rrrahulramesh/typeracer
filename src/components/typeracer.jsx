@@ -3,17 +3,18 @@ import React, { Component } from "react";
 class TypeRacer extends Component {
   state = {
     data: [],
+    userTypedData: "",
+    isGameStarted: false,
     timerOn: false,
+    timer: 0,
     timerTime: 0,
     timerStart: true,
     userData: "",
     dataArray: [],
     i: 0,
-    j: 0,
   };
 
   componentDidMount() {
-    var { dataArray, data } = this.state;
     fetch(
       "https://baconipsum.com/api/?type=all-meat&paras=2&start-with-lorem=1"
     )
@@ -22,9 +23,15 @@ class TypeRacer extends Component {
   }
 
   startTimer = () => {
-    const { data, dataArray } = this.state;
+    this.setState({ timerOn: true });
+    setTimeout(() => {
+      this.a();
+    }, 3000);
+  };
+
+  a = () => {
     this.setState({
-      timerOn: true,
+      isGameStarted: true,
       timerTime: this.state.timerTime,
       timerStart: Date.now() - this.state.timerTime,
     });
@@ -41,8 +48,10 @@ class TypeRacer extends Component {
     var { i, userData } = this.state;
 
     var a = input.value;
-    var arr;
-    arr = a.split(" ");
+
+    this.setState({ userTypedData: a });
+
+    var arr = a.split(" ");
     this.setState({ userData: arr });
 
     var d = [];
@@ -50,56 +59,50 @@ class TypeRacer extends Component {
     this.setState({ dataArray: d });
 
     if (userData == dataArray[i]) {
-      console.log(i);
       this.setState({ userData: "" });
       this.setState({ i: i + 1 });
 
       arr = "";
     }
-    // if (userData === dataArray[i] && userData === " ")
-    //   console.log(this.state.userData);
   };
 
   render() {
-    const { timerTime, userData } = this.state;
-    //let centiseconds = ("0" + (Math.floor(timerTime / 10) % 100)).slice(-2);
+    const { timerTime, timerOn, isGameStarted } = this.state;
     let seconds = ("0" + (Math.floor(timerTime / 1000) % 60)).slice(-2);
     let minutes = ("0" + (Math.floor(timerTime / 60000) % 60)).slice(-2);
-    //let hours = ("0" + Math.floor(timerTime / 3600000)).slice(-2);
+
     return (
-      <div className="container4">
-        <div className="row">
-          <h1>
-            {minutes}:{seconds}
-          </h1>
-        </div>
+      <div>
+        <div className="container4">
+          <div className="row">
+            <p>
+              {this.state.data === this.userTypedData}
+              <span className="p1">{this.state.data}</span>
+            </p>
+          </div>
+          <div className="row">
+            <h1>
+              {minutes}:{seconds}
+            </h1>
+          </div>
 
-        <div className="row">
-          <p>{this.state.data}</p>
-        </div>
+          <div className="row">
+            {this.state.timerOn === false && this.state.timerTime === 0 && (
+              <button onClick={this.startTimer}>Start</button>
+            )}
 
-        <div className="row">
-          {this.state.timerOn === false && this.state.timerTime === 0 && (
-            <button onClick={this.startTimer}>Start</button>
-          )}
-          {this.state.timerOn === true && (
-            // <textarea
-            //   value={this.state.userData}
-            //   type="text"
-            //   className="textarea"
-            //   placeholder="Write Here"
-            //   onChange={this.handleChange}
-            // ></textarea>
-            <input
-              value={this.state.userData}
-              type="text"
-              className="textarea"
-              placeholder="Write Here"
-              onChange={this.handleChange}
-            ></input>
-          )}
+            {timerOn === true && isGameStarted === true && (
+              <input
+                value={this.state.userData}
+                type="text"
+                className="textarea"
+                placeholder="Write Here"
+                onChange={this.handleChange}
+                autoFocus={this.state.isGameStarted}
+              ></input>
+            )}
+          </div>
         </div>
-        <div className="row"></div>
       </div>
     );
   }
